@@ -18,6 +18,22 @@ const generateRandomNumber = () => {
   return Math.ceil(Math.random() * maxRandom);
 };
 
+const GetComponent = ({isInOrder, currNumber, startGame}) => {
+  if (!isInOrder) {
+    return <Text fontWeight='500'>Numbers are not in order, please try again</Text>;
+  }
+
+  if (currNumber) {
+    return <Heading>{currNumber}</Heading>;
+  }
+
+  return (
+    <Button onClick={startGame} mt={2}>
+      Roll Number
+    </Button>
+  );
+};
+
 const isArrayInOrder = (arr) => {
   const filteredArr = [...arr].filter(Boolean);
   const sortedArr = [...filteredArr].sort((a, b) => a - b);
@@ -27,8 +43,9 @@ const isArrayInOrder = (arr) => {
 function App() {
   const [currNumber, setCurrNumber] = useState(null);
   const [slots, setSlots] = useState(Array.from(20).fill(null));
-  const [attempts, setAttempts] = useStickyState(0, 'attempts');
-  const [highScore, setHighScore] = useStickyState(0, 'highScore')
+  const [attempts, setAttempts] = useStickyState(0, "attempts");
+  const [highScore, setHighScore] = useStickyState(0, "highScore");
+  const [currScore, setCurrScore] = useState(0);
 
   const getNumber = () => {
     let newNumber = generateRandomNumber();
@@ -46,30 +63,32 @@ function App() {
     setCurrNumber(null);
     getNumber();
 
-    const score = newButtonNumbers.filter(Boolean).length
-    const isInOrder = isArrayInOrder(newButtonNumbers)
-    const finalScore = isInOrder ? score : score - 1
+    const score = newButtonNumbers.filter(Boolean).length;
+    const isInOrder = isArrayInOrder(newButtonNumbers);
+    const finalScore = isInOrder ? score : score - 1;
+    setCurrScore(finalScore);
 
     if (finalScore > highScore) {
-      setHighScore(finalScore)
-    } 
+      setHighScore(finalScore);
+    }
   };
 
   const restart = () => {
     setCurrNumber(null);
     setSlots(Array.from(20).fill(null));
+    setCurrScore(0);
   };
 
   const startGame = () => {
     getNumber();
     setAttempts((tries) => tries + 1);
-  }
+  };
 
   const isInOrder = isArrayInOrder(slots);
 
   return (
     <ChakraProvider>
-      <Flex alignItems="center" direction="column" w="100%">
+      <Flex alignItems="center" direction="column" w="100%" mb={4} pb={4}>
         <Heading>20 In A Row</Heading>
 
         <Tutorial />
@@ -86,18 +105,14 @@ function App() {
           </Button>
         </Flex>
 
-        <Box minH="50px" mt={4}>
-          {currNumber ? (
-            <Heading>{currNumber}</Heading>
-          ) : (
-            <Button onClick={startGame} mt={2}>
-              Roll Number
-            </Button>
-          )}
-        </Box>
+        <Text mt={2}>Current Score: {currScore}</Text>
 
-        <Box minH='24px'>
-          {!isInOrder && <Text>Numbers are not in order, please try again</Text>}
+        <Box minH="50px" mt={4}>
+          <GetComponent
+            isInOrder={isInOrder}
+            currNumber={currNumber}
+            startGame={startGame}
+          />
         </Box>
 
         <Flex direction="column" mt={4} alignItems="center">

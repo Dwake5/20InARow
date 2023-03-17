@@ -1,5 +1,6 @@
 import { Text, Box } from "@chakra-ui/react";
 
+
 export const Tutorial = () => {
   return (
     <Box textAlign='center'>
